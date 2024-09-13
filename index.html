@@ -178,9 +178,9 @@
         $canvas.addEventListener('mousedown', startDrawing)
         $canvas.addEventListener('touchstart', startDrawing)
         $canvas.addEventListener('mousemove', draw)
-        $canvas.addEventListener('touchend', draw)
+        $canvas.addEventListener('touchmove', draw)
         $canvas.addEventListener('mouseup', stopDrawing)
-        $canvas.addEventListener('touchcancel', stopDrawing)
+        $canvas.addEventListener('touchend', stopDrawing)
         $canvas.addEventListener('mouseleave', stopDrawing)
 
         $colorPicker.addEventListener('change', handleChangeColor)
