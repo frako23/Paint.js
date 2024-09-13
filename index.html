@@ -207,6 +207,7 @@
 
         // METHODS
         function startDrawing(event) {
+            event.preventDefault();
             isDrawing = true
 
             const { offsetX, offsetY } = event
@@ -219,7 +220,7 @@
         }
 
         function draw(event) {
-
+            event.preventDefault();
             if (!isDrawing) return
 
             const { offsetX, offsetY } = event
