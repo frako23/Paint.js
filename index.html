@@ -176,11 +176,11 @@
 
         // EVENTS
         $canvas.addEventListener('mousedown', startDrawing)
-        $canvas.addEventListener('touchstart', startDrawing)
+        $canvas.addEventListener('touchstart', startTouchDrawing)
         $canvas.addEventListener('mousemove', draw)
-        $canvas.addEventListener('touchmove', draw)
+        $canvas.addEventListener('touchmove', touchDraw)
         $canvas.addEventListener('mouseup', stopDrawing)
-        $canvas.addEventListener('touchend', stopDrawing)
+        $canvas.addEventListener('touchend', stopTouchDrawing)
         $canvas.addEventListener('mouseleave', stopDrawing)
 
         $colorPicker.addEventListener('change', handleChangeColor)
@@ -208,8 +208,7 @@
         // METHODS
         function startDrawing(event) {
             isDrawing = true
-            
-            event.preventDefault();
+
             const { offsetX, offsetY } = event
 
                 //guarda las coordenadas iniciales
@@ -219,10 +218,22 @@
             imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
 
+        function startTouchDrawing(event) {
+            isDrawing = true
+
+            event.preventDefault();
+            const { pageX, pageY } = event.changedTouches[0]
+
+                //guarda las coordenadas iniciales
+                ;[startX, startY] = [pageX, pageY]
+                ;[lastX, lastY] = [pageX, pageY]
+
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+
         function draw(event) {
             if (!isDrawing) return
-            
-            event.preventDefault();
+
             const { offsetX, offsetY } = event
 
             if (mode === MODES.DRAW || mode === MODES.ERASE) {
@@ -266,11 +277,64 @@
         }
 
 
-        
+        function touchDraw(event) {
+            if (!isDrawing) return
+
+            event.preventDefault();
+            console.log(event.changedTouches[0]);
+
+            const { pageX, pageY } = event.changedTouches[0]
+
+            if (mode === MODES.DRAW || mode === MODES.ERASE) {
+                // comenzar un trazado
+                ctx.beginPath()
+
+                // mover el trazado a las coordenadas actuales
+                ctx.moveTo(lastX, lastY)
+
+                // dibujar una linea entre coordenadas actuales y las nuevas
+                ctx.lineTo(pageX, pageY)
+
+                ctx.stroke()
+
+                    // ctx.lineWidth = 1
+                    // actualizar las últimas coordenadas
+                    ;[lastX, lastY] = [pageX, pageY]
+                return
+            }
+
+            if (mode === MODES.RECTANGLE) {
+                ctx.putImageData(imageData, 0, 0)
+
+                //startX --> coordenada inicial del click
+                let width = pageX - startX
+                let height = pageY - startY
+
+                if (isShiftPressed) {
+                    const sideLength = Math.min(Math.abs(width), Math.abs(height))
+
+                    width = width > 0 ? sideLength : -sideLength
+                    height = height > 0 ? sideLength : -sideLength
+                }
+
+                ctx.beginPath()
+                ctx.rect(startX, startY, width, height)
+                ctx.stroke()
+                return
+            }
+
+        }
+
 
         function stopDrawing(event) {
             isDrawing = false
         }
+
+        function stopTouchDrawing(event) {
+            isDrawing = false
+            event.preventDefault();
+        }
+
 
         function handleChangeColor() {
             const { value } = $colorPicker
