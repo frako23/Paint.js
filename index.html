@@ -219,14 +219,18 @@
         }
 
         function startTouchDrawing(event) {
-            isDrawing = true
+            isDrawing = true;
 
             event.preventDefault();
-            const { pageX, pageY } = event.changedTouches[0]
+            const { pageX, pageY } = event.changedTouches[0];
+            const rect = $canvas.getBoundingClientRect(); // Obtener la posición del canvas
 
-                //guarda las coordenadas iniciales
-                ;[startX, startY] = [pageX, pageY]
-                ;[lastX, lastY] = [pageX, pageY]
+            // Calcular las coordenadas correctas dentro del canvas
+            const x = pageX - rect.left;
+            const y = pageY - rect.top;
+
+            [startX, startY] = [x, y];
+            [lastX, lastY] = [x, y];
 
             imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
@@ -278,50 +282,42 @@
 
 
         function touchDraw(event) {
-            if (!isDrawing) return
+            if (!isDrawing) return;
 
-            event.preventDefault();
-            console.log(event.changedTouches[0]);
+    event.preventDefault();
+    const { pageX, pageY } = event.changedTouches[0];
+    const rect = $canvas.getBoundingClientRect(); // Obtener la posición del canvas
 
-            const { pageX, pageY } = event.changedTouches[0]
+    // Calcular las coordenadas correctas dentro del canvas
+    const x = pageX - rect.left;
+    const y = pageY - rect.top;
 
-            if (mode === MODES.DRAW || mode === MODES.ERASE) {
-                // comenzar un trazado
-                ctx.beginPath()
+    if (mode === MODES.DRAW || mode === MODES.ERASE) {
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        [lastX, lastY] = [x, y];
+        return;
+    }
 
-                // mover el trazado a las coordenadas actuales
-                ctx.moveTo(lastX, lastY)
+    if (mode === MODES.RECTANGLE) {
+        ctx.putImageData(imageData, 0, 0);
 
-                // dibujar una linea entre coordenadas actuales y las nuevas
-                ctx.lineTo(pageX, pageY)
+        let width = x - startX;
+        let height = y - startY;
 
-                ctx.stroke()
+        if (isShiftPressed) {
+            const sideLength = Math.min(Math.abs(width), Math.abs(height));
+            width = width > 0 ? sideLength : -sideLength;
+            height = height > 0 ? sideLength : -sideLength;
+        }
 
-                    // ctx.lineWidth = 1
-                    // actualizar las últimas coordenadas
-                    ;[lastX, lastY] = [pageX, pageY]
-                return
-            }
-
-            if (mode === MODES.RECTANGLE) {
-                ctx.putImageData(imageData, 0, 0)
-
-                //startX --> coordenada inicial del click
-                let width = pageX - startX
-                let height = pageY - startY
-
-                if (isShiftPressed) {
-                    const sideLength = Math.min(Math.abs(width), Math.abs(height))
-
-                    width = width > 0 ? sideLength : -sideLength
-                    height = height > 0 ? sideLength : -sideLength
-                }
-
-                ctx.beginPath()
-                ctx.rect(startX, startY, width, height)
-                ctx.stroke()
-                return
-            }
+        ctx.beginPath();
+        ctx.rect(startX, startY, width, height);
+        ctx.stroke();
+        return;
+    }
 
         }
 
