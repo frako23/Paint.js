@@ -139,7 +139,18 @@
             background-size: 20px;
         }
 
+        @media (max-width: 600px) {
+            body{
+                padding: 0;
+            }
+            h1 {
+                font-size: 24px;
 
+                img {
+                    width: 32px;
+                }
+            }
+        }
     </style>
 
     <script type="module">
@@ -290,7 +301,7 @@
             }
         }
 
-        
+
 
         function stopDrawing(event) {
             isDrawing = false
@@ -316,40 +327,40 @@
         function touchDraw(event) {
             if (!isDrawing) return;
 
-    event.preventDefault();
-    const { pageX, pageY } = event.changedTouches[0];
-    const rect = $canvas.getBoundingClientRect(); // Obtener la posición del canvas
+            event.preventDefault();
+            const { pageX, pageY } = event.changedTouches[0];
+            const rect = $canvas.getBoundingClientRect(); // Obtener la posición del canvas
 
-    // Calcular las coordenadas correctas dentro del canvas
-    const x = pageX - rect.left;
-    const y = pageY - rect.top;
+            // Calcular las coordenadas correctas dentro del canvas
+            const x = pageX - rect.left;
+            const y = pageY - rect.top;
 
-    if (mode === MODES.DRAW || mode === MODES.ERASE) {
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        [lastX, lastY] = [x, y];
-        return;
-    }
+            if (mode === MODES.DRAW || mode === MODES.ERASE) {
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                [lastX, lastY] = [x, y];
+                return;
+            }
 
-    if (mode === MODES.RECTANGLE) {
-        ctx.putImageData(imageData, 0, 0);
+            if (mode === MODES.RECTANGLE) {
+                ctx.putImageData(imageData, 0, 0);
 
-        let width = x - startX;
-        let height = y - startY;
+                let width = x - startX;
+                let height = y - startY;
 
-        if (isShiftPressed) {
-            const sideLength = Math.min(Math.abs(width), Math.abs(height));
-            width = width > 0 ? sideLength : -sideLength;
-            height = height > 0 ? sideLength : -sideLength;
-        }
+                if (isShiftPressed) {
+                    const sideLength = Math.min(Math.abs(width), Math.abs(height));
+                    width = width > 0 ? sideLength : -sideLength;
+                    height = height > 0 ? sideLength : -sideLength;
+                }
 
-        ctx.beginPath();
-        ctx.rect(startX, startY, width, height);
-        ctx.stroke();
-        return;
-    }
+                ctx.beginPath();
+                ctx.rect(startX, startY, width, height);
+                ctx.stroke();
+                return;
+            }
 
         }
 
@@ -438,20 +449,20 @@
         }
 
         function resizeCanvas() {
-        if (window.innerWidth <= 768) { // Puedes ajustar este valor según tus necesidades
-            $canvas.width = 400;
-            $canvas.height = 600;
-        } else {
-            $canvas.width = 600;
-            $canvas.height = 400;
+            if (window.innerWidth <= 768) { // Puedes ajustar este valor según tus necesidades
+                $canvas.width = 400;
+                $canvas.height = 600;
+            } else {
+                $canvas.width = 600;
+                $canvas.height = 400;
+            }
         }
-    }
 
-    // Llama a la función cuando la página se carga
-    window.onload = resizeCanvas;
+        // Llama a la función cuando la página se carga
+        window.onload = resizeCanvas;
 
-    // Llama a la función cuando la ventana cambia de tamaño
-    window.onresize = resizeCanvas;
+        // Llama a la función cuando la ventana cambia de tamaño
+        window.onresize = resizeCanvas;
     </script>
 </head>
 
@@ -470,13 +481,13 @@
                 <button id="ellipse-btn" title="Elipse"></button>
                 <button disabled id="picker-btn" title="Capturar Color"></button>
                 <button id="clear-btn" title="Limpiar dibujo"></button>
+                <input type="color" id="color-picker" value="#000000">
             </nav>
         </aside>
 
         <main><canvas id="canvas" width="600" height="400"></canvas></main>
 
         <footer>
-            <input type="color" id="color-picker" value="#000000">
         </footer>
     </div>
 </body>
