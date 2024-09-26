@@ -352,6 +352,8 @@
                 ctx.moveTo(lastX, lastY);
                 ctx.lineTo(x, y);
                 ctx.stroke();
+                thickness = document.getElementById("thickness").value;
+                ctx.lineWidth = thickness
                 [lastX, lastY] = [x, y];
                 return;
             }
