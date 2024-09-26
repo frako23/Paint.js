@@ -138,6 +138,8 @@
             background-image: url('./icons/trash.png');
             background-size: 20px;
         }
+
+
     </style>
 
     <script type="module">
@@ -160,6 +162,7 @@
         const $clearBtn = $('#clear-btn')
         const $drawBtn = $('#draw-btn')
         const $rectangleBtn = $('#rectangle-btn')
+        const $ellipseBtn = $('#ellipse-btn')
         const $eraseBtn = $('#erase-btn')
         const $pickerBtn = $('#picker-btn')
 
@@ -201,6 +204,10 @@
             setMode(MODES.RECTANGLE)
         })
 
+        $ellipseBtn.addEventListener('click', () => {
+            setMode(MODES.ELLIPSE)
+        })
+
         $drawBtn.addEventListener('click', () => {
             setMode(MODES.DRAW)
         })
@@ -214,23 +221,6 @@
                 //guarda las coordenadas iniciales
                 ;[startX, startY] = [offsetX, offsetY]
                 ;[lastX, lastY] = [offsetX, offsetY]
-
-            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        }
-
-        function startTouchDrawing(event) {
-            isDrawing = true;
-
-            event.preventDefault();
-            const { pageX, pageY } = event.changedTouches[0];
-            const rect = $canvas.getBoundingClientRect(); // Obtener la posición del canvas
-
-            // Calcular las coordenadas correctas dentro del canvas
-            const x = pageX - rect.left;
-            const y = pageY - rect.top;
-
-            [startX, startY] = [x, y];
-            [lastX, lastY] = [x, y];
 
             imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
@@ -278,8 +268,50 @@
                 return
             }
 
+
+            if (mode === MODES.ELLIPSE) {
+                ctx.putImageData(imageData, 0, 0)
+
+                //startX --> coordenada inicial del click
+                let width = offsetX - startX
+                let height = offsetY - startY
+
+                if (isShiftPressed) {
+                    const sideLength = Math.min(Math.abs(width), Math.abs(height))
+
+                    width = width > 0 ? sideLength : -sideLength
+                    height = height > 0 ? sideLength : -sideLength
+                }
+
+                ctx.beginPath()
+                ctx.ellipse(startX + width / 2, startY + height / 2, Math.abs(width) / 2, Math.abs(height) / 2, 0, 0, 2 * Math.PI);
+                ctx.stroke()
+                return
+            }
         }
 
+        
+
+        function stopDrawing(event) {
+            isDrawing = false
+        }
+
+        function startTouchDrawing(event) {
+            isDrawing = true;
+
+            event.preventDefault();
+            const { pageX, pageY } = event.changedTouches[0];
+            const rect = $canvas.getBoundingClientRect(); // Obtener la posición del canvas
+
+            // Calcular las coordenadas correctas dentro del canvas
+            const x = pageX - rect.left;
+            const y = pageY - rect.top;
+
+            [startX, startY] = [x, y];
+            [lastX, lastY] = [x, y];
+
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
 
         function touchDraw(event) {
             if (!isDrawing) return;
@@ -321,11 +353,6 @@
 
         }
 
-
-        function stopDrawing(event) {
-            isDrawing = false
-        }
-
         function stopTouchDrawing(event) {
             isDrawing = false
             event.preventDefault();
@@ -357,6 +384,13 @@
             if (mode === MODES.RECTANGLE) {
                 $rectangleBtn.classList.add('active')
                 canvas.style.cursor = 'url("./icons/rectangle.png") 0 24, auto'
+                ctx.globalCompositeOperation = 'source-over'
+                return
+            }
+
+            if (mode === MODES.ELLIPSE) {
+                $ellipseBtn.classList.add('active')
+                canvas.style.cursor = 'url("./icons/ellipse.png") 0 24, auto'
                 ctx.globalCompositeOperation = 'source-over'
                 return
             }
@@ -402,6 +436,22 @@
         if (typeof window.EyeDropper !== 'undefined') {
             $pickerBtn.removeAttribute('disabled')
         }
+
+        function resizeCanvas() {
+        if (window.innerWidth <= 768) { // Puedes ajustar este valor según tus necesidades
+            $canvas.width = 400;
+            $canvas.height = 600;
+        } else {
+            $canvas.width = 600;
+            $canvas.height = 400;
+        }
+    }
+
+    // Llama a la función cuando la página se carga
+    window.onload = resizeCanvas;
+
+    // Llama a la función cuando la ventana cambia de tamaño
+    window.onresize = resizeCanvas;
     </script>
 </head>
 
