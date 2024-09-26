@@ -92,6 +92,10 @@
                 justify-content: center;
             }
 
+            label {
+                font-size: 12px;
+            }
+
             button {
                 width: 24px;
                 height: 24px;
@@ -140,9 +144,10 @@
         }
 
         @media (max-width: 600px) {
-            body{
+            body {
                 padding: 0;
             }
+
             h1 {
                 font-size: 24px;
 
@@ -187,6 +192,7 @@
         let lastY = 0
         let mode = MODES.DRAW
         let imageData
+        let thickness = 1
 
         // EVENTS
         $canvas.addEventListener('mousedown', startDrawing)
@@ -236,6 +242,8 @@
             imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
 
+
+
         function draw(event) {
             if (!isDrawing) return
 
@@ -253,7 +261,11 @@
 
                 ctx.stroke()
 
-                    // ctx.lineWidth = 1
+
+                thickness = document.getElementById("thickness").value;
+
+
+                ctx.lineWidth = thickness
                     // actualizar las últimas coordenadas
                     ;[lastX, lastY] = [offsetX, offsetY]
                 return
@@ -482,6 +494,15 @@
                 <button disabled id="picker-btn" title="Capturar Color"></button>
                 <button id="clear-btn" title="Limpiar dibujo"></button>
                 <input type="color" id="color-picker" value="#000000">
+                <div><label for="thickness">Grosor</label>
+                    <select id="thickness" onchange="updateThickness()">
+                        <option value="1">1px</option>
+                        <option value="2">2px</option>
+                        <option value="3">3px</option>
+                        <option value="4">4px</option>
+                        <option value="5">5px</option>
+                    </select>
+                </div>
             </nav>
         </aside>
 
