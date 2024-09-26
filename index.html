@@ -155,6 +155,10 @@
                     width: 32px;
                 }
             }
+
+            .hidden {
+                display: none;
+            }
         }
     </style>
 
@@ -352,8 +356,7 @@
                 ctx.moveTo(lastX, lastY);
                 ctx.lineTo(x, y);
                 ctx.stroke();
-                thickness = document.getElementById("thickness").value;
-                ctx.lineWidth = thickness
+
                 [lastX, lastY] = [x, y];
                 return;
             }
@@ -496,7 +499,7 @@
                 <button disabled id="picker-btn" title="Capturar Color"></button>
                 <button id="clear-btn" title="Limpiar dibujo"></button>
                 <input type="color" id="color-picker" value="#000000">
-                <div><label for="thickness">Grosor</label>
+                <div class="hidden"><label for="thickness">Grosor</label>
                     <select id="thickness" onchange="updateThickness()">
                         <option value="1">1px</option>
                         <option value="2">2px</option>
